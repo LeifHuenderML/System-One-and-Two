@@ -1,27 +1,17 @@
 cmake_minimum_required(VERSION 3.10)
-project(Andrea CUDA CXX)
+project(andrea)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(CUDA REQUIRED)
+find_package(pybind11 REQUIRED)
 
-include_directories(include)
-
-# Library target
-add_library(andrea
+pybind11_add_module(_andrea 
+    python/src/bindings.cpp
     src/tensor.cpp
-    src/ops/cuda_ops.cu
-    src/hello_world.cpp  # Make sure this line is present
+    src/ops/tensor_ops.cpp
+    src/ops/cpu_ops.cpp  # Make sure this is included
+    # Add any other source files here
 )
 
-target_include_directories(andrea PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(andrea ${CUDA_LIBRARIES})
-
-# Test target
-add_executable(tests tests/cpp/test_tensor.cpp)
-target_link_libraries(tests PRIVATE andrea)
-
-# Installation
-install(TARGETS andrea DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include)
+target_include_directories(_andrea PRIVATE include)

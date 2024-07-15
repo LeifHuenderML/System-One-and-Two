@@ -15,7 +15,7 @@ class GetPybindInclude(object):
 ext_modules = [
     Extension(
         'andrea._andrea',
-        ['python/src/bindings.cpp', 'src/hello_world.cpp'],
+        ['python/src/bindings.cpp', 'src/tensor.cpp', 'src/hello_world.cpp', 'src/tensor_ops.cpp', 'src/ops/cpu_ops.cpp'],
         include_dirs=[
             GetPybindInclude(),
             GetPybindInclude(user=True),
@@ -29,9 +29,9 @@ ext_modules = [
 setup(
     name='andrea',
     version='0.0.1',
-    author='Your Name',
-    author_email='your.email@example.com',
-    description='Andrea tensor library',
+    author='Leif Huender',
+    author_email='leifhuenderai@gmail.com',
+    description='Tensor and autograd library.',
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.4'],

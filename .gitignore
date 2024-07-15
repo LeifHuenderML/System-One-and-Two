@@ -164,5 +164,4 @@ cython_debug/
 
 data
 .data
-papers
-papers\ copy
+research_papers

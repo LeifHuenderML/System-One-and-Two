@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "start-python-debugger",
+            "type": "process",
+            "command": "${command:workbench.action.debug.start}",
+            "args": ["Python: Current File"],
+            "problemMatcher": []
+        }
+    ]
+}

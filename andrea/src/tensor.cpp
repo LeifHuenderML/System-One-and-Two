@@ -11,7 +11,7 @@ Tensor* create_tensor(const float* data, std::vector<int> shape, std::string dev
 
     tensor->ndim = shape.size();
     tensor->size = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
-    tensor->device = device;
+    tensor->device = "cpu";
 
     // Allocate and copy shape
     tensor->shape = new int[tensor->ndim];
@@ -32,6 +32,8 @@ Tensor* create_tensor(const float* data, std::vector<int> shape, std::string dev
     } else {
         std::fill(tensor->data, tensor->data + tensor->size, 0.0f);
     }
+
+    to_device(*tensor, device);
     
 
     return tensor;
@@ -89,8 +91,64 @@ void delete_data(Tensor* tensor){
     }
 }
 
+void to_device(Tensor& tensor, const std::string device) {
+    if (tensor.device == device) {
+        return;
+    }
+    else if (device == "cpu"){
+        cuda_to_cpu(tensor);
+    }
+    else if (device == "cuda"){
+        std::cout << "took this path";
+        cpu_to_cuda(tensor);
+    }
+    else{
+        throw std::invalid_argument("Input for device must be cuda or cpu.\n");
+    }
+}
 
-// void to_device(Tensor* tensor, char* device);
+Tensor* add_tensor(Tensor* tensor1, Tensor* tensor2) {
+    if (tensor1->ndim != tensor2->ndim) {
+        throw std::runtime_error("Tensors must be the same dimension");
+    }
+    if (tensor1->device != tensor2->device) {
+        throw std::runtime_error("Tensors must be on the same device");
+    }
+
+    std::vector<int> shape;
+    for (int i = 0; i < tensor1->ndim; i++) {
+        if (tensor1->shape[i] != tensor2->shape[i]) {
+            throw std::runtime_error("Tensors must have the same shape");
+        }
+        shape.push_back(tensor1->shape[i]);
+    }
+
+    float* result_data = nullptr;
+    if (tensor1->device == "cpu") {
+        result_data = new float[tensor1->size];
+        add_tensor_cpu(tensor1, tensor2, result_data);
+    }
+    else if (tensor1->device == "cuda") {
+        cudaError_t err = cudaMalloc(&result_data, tensor1->size * sizeof(float));
+        if (err != cudaSuccess) {
+            throw std::runtime_error("CUDA memory allocation failed: " + std::string(cudaGetErrorString(err)));
+        }
+        add_tensor_cuda(tensor1, tensor2, result_data);
+    }
+    else {
+        throw std::runtime_error("Unknown device: " + tensor1->device);
+    }
+
+    return create_tensor(result_data, shape, tensor1->device);
+}
+
+void add_tensor_cpu(Tensor* tensor1, Tensor* tensor2, float* result_data) {
+    
+    for (int i = 0; i < tensor1->size; i++) {
+        result_data[i] = tensor1->data[i] + tensor2->data[i];
+    }
+}
+
 // float get_item(Tensor* tensor, int* indices);
 // Tensor* add_tensor(Tensor* tensor1, Tensor* tensor2);
 // void make_contiguous(Tensor* tensor);

@@ -1,7 +1,7 @@
 #ifndef ANDREA_CPU_OPS_HPP
 #define ANDREA_CPU_OPS_HPP
 
-#include "common.hpp"
+#include "andrea/common.hpp"
 #include <algorithm>
 #include <cstring>
 #include <stdexcept>

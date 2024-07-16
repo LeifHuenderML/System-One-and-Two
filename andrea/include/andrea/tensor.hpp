@@ -7,19 +7,12 @@
 #include <memory>
 #include <string>
 #include <random>
-#include "common.hpp"
+#include <cuda_runtime.h>
+#include "andrea/common.hpp"
+#include "andrea/cuda.hpp"
+#include <vector>
 
 namespace andrea{
-
-struct Tensor{
-    float* data;
-    int* strides;
-    int* shape;
-    int ndim;
-    int size;
-    std::string device;
-};
-
 
 Tensor* create_tensor(const float* data, std::vector<int> shape, std::string device="cuda");
 Tensor* create_ones(std::vector<int> shape, std::string device="cuda");
@@ -31,7 +24,12 @@ void delete_strides(Tensor* tensor);
 void delete_shape(Tensor* tensor);
 void delete_data(Tensor* tensor);
 
-// void to_device(Tensor* tensor, char* device);
+void to_device(Tensor& tensor, const std::string device);
+
+Tensor* add_tensor(Tensor* tensor1, Tensor* tensor2);
+
+void add_tensor_cpu(Tensor* tensor1, Tensor* tensor2, float* result_data);
+
 // float get_item(Tensor* tensor, int* indices);
 // Tensor* add_tensor(Tensor* tensor1, Tensor* tensor2);
 // void make_contiguous(Tensor* tensor);
